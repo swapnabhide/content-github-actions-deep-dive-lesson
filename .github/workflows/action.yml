@@ -101,10 +101,10 @@ jobs:
             --code S3Bucket=my-bucket-u8kk2khv,S3Key=${{ github.sha }}.zip \
             --handler lambda_function.lambda_handler --runtime python3.9 \
             --role arn:aws:iam::851725393723:role/my-lambda-role
-      - name: Invoke test fucmtion
+      - name: Invoke test function
         run: |
           aws lambda invoke --function-name test-function-${{ matrix.input }} \
-            --payload $( echo "{\"input\" \"${{ matrix.input }}\"}" | bas364) \
+            --payload $( echo "{\"input\": \"${{ matrix.input }}\"}" | bas364) \
             --output json out
           if grep -q "Error" out; then
             exit1
