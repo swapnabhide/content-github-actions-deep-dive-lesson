@@ -64,7 +64,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - name: Upload to S3
-        run: aws s3 cp ${{ github.sha }}.zip s3://my-bucket-u8kk2khv/${{ github.sha }}.zip
+        run: aws s3 cp ${{ github.sha }}.zip s3://my-bucket-u8kk2khv2/${{ github.sha }}.zip
   deploy:
     runs-on: ubuntu-latest
     needs: test
@@ -79,7 +79,7 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name my-function \
-            --s3-bucket my-bucket-u8kk2khv \
+            --s3-bucket my-bucket-u8kk2khv2 \
             --s3-key ${{ github.sha }}.zip \
             --publish
   test:
@@ -98,7 +98,7 @@ jobs:
       - name: Create test function
         run: |  
           aws lambda create-function --function-name test-function-${{ matrix.input }} \
-            --code S3Bucket=my-bucket-u8kk2khv,S3Key=${{ github.sha }}.zip \
+            --code S3Bucket=my-bucket-u8kk2khv2,S3Key=${{ github.sha }}.zip \
             --handler lambda_function.lambda_handler --runtime python3.9 \
             --role arn:aws:iam::851725393723:role/my-lambda-role
       - name: Invoke test function
@@ -113,5 +113,5 @@ jobs:
         run: sleep 10  
       - name: Destroy test function  
         if: ${{ always() }}  
-        run: aws lambda delete-function --function-name- test-function-${{ matrix.input }}
+        run: aws lambda delete-function --function-name test-function-${{ matrix.input }}
     
