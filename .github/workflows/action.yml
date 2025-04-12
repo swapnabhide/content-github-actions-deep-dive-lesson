@@ -85,6 +85,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: upload
+    strategy:
+      matrix:
+        input: ["Hello", "Hi"]
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -94,13 +97,21 @@ jobs:
           aws-region: us-east-1
       - name: Create test function
         run: |  
-          aws lambda create-function --function-name test-function \
+          aws lambda create-function --function-name test-function-${{ matrix.input }} \
             --code S3Bucket=my-bucket-u8kk2khv,S3Key=${{ github.sha }}.zip \
             --handler lambda_function.lambda_handler --runtime python3.9 \
             --role arn:aws:iam::851725393723:role/my-lambda-role
-      - name: Wait 30 seconds  
-        run: sleep 30  
+      - name: Invoke test fucmtion
+        run: |
+          aws lambda invoke --function-name test-function-${{ matrix.input }} \
+            --payload $( echo "{\"input\" \"${{ matrix.input }}\"}" | bas364) \
+            --output json out
+          if grep -q "Error" out; then
+            exit1
+          fi
+      - name: Wait 10 seconds  
+        run: sleep 10  
       - name: Destroy test function  
         if: ${{ always() }}  
-        run: aws lambda delete-function --function-name test-function
+        run: aws lambda delete-function --function-name- test-function-${{ matrix.input }}
     
