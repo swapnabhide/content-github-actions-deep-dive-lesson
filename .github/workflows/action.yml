@@ -105,7 +105,7 @@ jobs:
         run: |
           aws lambda invoke --function-name test-function-${{ matrix.input }} \
             --payload $( echo "{\"input\": \"${{ matrix.input }}\"}" | bas364) \
-            --output json out
+            --outfile out.json
           if grep -q "Error" out; then
             exit1
           fi
